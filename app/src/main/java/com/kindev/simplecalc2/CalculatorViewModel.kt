@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import net.objecthunter.exp4j.ExpressionBuilder
+import net.objecthunter.exp4j.function.Function
+
 
 class CalculatorViewModel : ViewModel() {
     private val _result = MutableStateFlow("0")
@@ -19,6 +21,12 @@ class CalculatorViewModel : ViewModel() {
 
     private var lastInputWasResult = false
 
+    // Custom square root function for the expression builder
+    private val sqrtFunction = object : Function("sqrt", 1) {
+        override fun apply(vararg args: Double): Double {
+            return Math.sqrt(args[0])
+        }
+    }
 
     fun updateDisplayValue(value: Double) {
         viewModelScope.launch {
@@ -52,15 +60,10 @@ class CalculatorViewModel : ViewModel() {
                 println("Operator clicked: $operator")
                 when (operator) {
                     "√" -> {
-                        val currentResult = _result.value.toDoubleOrNull()
-                        if (currentResult != null && currentResult >= 0) {
-                            val sqrtValue = Math.sqrt(currentResult)
-                            println("Square root of $currentResult is $sqrtValue")
-                            updateDisplayValue(sqrtValue)
-                        } else {
-                            _result.value = "Error"
-                            println("Square root error: Invalid input")
+                        if (lastInputWasResult) {
+                            lastInputWasResult = false
                         }
+                        _result.value += "√("
                     }
                     "+" -> {
                         if (lastInputWasResult) {
@@ -98,10 +101,13 @@ class CalculatorViewModel : ViewModel() {
                         println("Updated result: ${_result.value}")
                     }
                     "=" -> {
-                        val expression = ExpressionBuilder(_result.value).build()
+                        val expressionStr = _result.value.replace("√", "sqrt")
+                        val expression = ExpressionBuilder(expressionStr)
+                            .function(sqrtFunction)
+                            .build()
                         val finalResult = expression.evaluate()
-                        println("Expression evaluated: ${_result.value} = $finalResult")
-                        addToHistory(_result.value, finalResult)
+                        println("Expression evaluated: $expressionStr = $finalResult")
+                        addToHistory(expressionStr, finalResult)
                         updateDisplayValue(finalResult)
                     }
                 }

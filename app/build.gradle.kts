@@ -51,6 +51,9 @@ android {
 
 dependencies {
 
+    implementation(libs.matheclipse.core)
+    implementation(libs.matheclipse.parser)
+
     implementation(libs.exp4j)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
