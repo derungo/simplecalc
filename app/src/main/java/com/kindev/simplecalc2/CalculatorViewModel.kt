@@ -5,8 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import net.objecthunter.exp4j.ExpressionBuilder
-import net.objecthunter.exp4j.function.Function
+import org.mariuszgromada.math.mxparser.Expression
 
 
 class CalculatorViewModel : ViewModel() {
@@ -21,12 +20,6 @@ class CalculatorViewModel : ViewModel() {
 
     private var lastInputWasResult = false
 
-    // Custom square root function for the expression builder
-    private val sqrtFunction = object : Function("sqrt", 1) {
-        override fun apply(vararg args: Double): Double {
-            return Math.sqrt(args[0])
-        }
-    }
 
     fun updateDisplayValue(value: Double) {
         viewModelScope.launch {
@@ -60,60 +53,67 @@ class CalculatorViewModel : ViewModel() {
                 println("Operator clicked: $operator")
                 when (operator) {
                     "√" -> {
-                        if (lastInputWasResult) {
-                            lastInputWasResult = false
+                        if (_result.value == "0" || lastInputWasResult) {
+                            _result.value = "√("
+                        } else {
+                            val lastChar = _result.value.last()
+                            if (lastChar.isDigit() || lastChar == ')') {
+                                _result.value += "*√("
+                            } else {
+                                _result.value += "√("
+                            }
                         }
-                        _result.value += "√("
+                        lastInputWasResult = false
                     }
-                    "+" -> {
+                    "+", "-", "*", "/", "^" -> {
                         if (lastInputWasResult) {
                             lastInputWasResult = false
                         }
-                        _result.value += "+"
-                        println("Updated result: ${_result.value}")
-                    }
-                    "-" -> {
-                        if (lastInputWasResult) {
-                            lastInputWasResult = false
-                        }
-                        _result.value += "-"
-                        println("Updated result: ${_result.value}")
-                    }
-                    "*" -> {
-                        if (lastInputWasResult) {
-                            lastInputWasResult = false
-                        }
-                        _result.value += "*"
-                        println("Updated result: ${_result.value}")
-                    }
-                    "/" -> {
-                        if (lastInputWasResult) {
-                            lastInputWasResult = false
-                        }
-                        _result.value += "/"
-                        println("Updated result: ${_result.value}")
-                    }
-                    "^" -> {
-                        if (lastInputWasResult) {
-                            lastInputWasResult = false
-                        }
-                        _result.value += "^"
+                        _result.value += operator
                         println("Updated result: ${_result.value}")
                     }
                     "=" -> {
-                        val expressionStr = _result.value.replace("√", "sqrt")
-                        val expression = ExpressionBuilder(expressionStr)
-                            .function(sqrtFunction)
-                            .build()
-                        val finalResult = expression.evaluate()
-                        println("Expression evaluated: $expressionStr = $finalResult")
-                        addToHistory(expressionStr, finalResult)
-                        updateDisplayValue(finalResult)
+                        var expression = _result.value
+                        // Append closing parenthesis if there's an unmatched opening parenthesis
+                        val openParentheses = expression.count { it == '(' }
+                        val closeParentheses = expression.count { it == ')' }
+                        if (openParentheses > closeParentheses) {
+                            expression += ")".repeat(openParentheses - closeParentheses)
+                        }
+                        // Replace display operator with internal operator for evaluation
+                        expression = expression.replace("√", "sqrt")
+                        val exp = Expression(expression)
+                        val finalResult = exp.calculate()
+                        if (finalResult.isNaN()) {
+                            _result.value = "Error"
+                        } else {
+                            println("Expression evaluated: $expression = $finalResult")
+                            addToHistory(_result.value, finalResult)
+                            updateDisplayValue(finalResult)
+                        }
                     }
                 }
             } catch (e: Exception) {
                 _result.value = "Error"
                 println("Error in operator clicked: $e")
+            }
+        }
+    }
+    private fun evaluateExpression() {
+        viewModelScope.launch {
+            try {
+                val expression = Expression(_result.value)
+                val finalResult = expression.calculate()
+                if (finalResult.isNaN()) {
+                    _result.value = "Error"
+                } else {
+                    println("Expression evaluated: ${_result.value} = $finalResult")
+                    addToHistory(_result.value, finalResult)
+                    updateDisplayValue(finalResult)
+                }
+            } catch (e: Exception) {
+                _result.value = "Error"
+                println("Error in evaluateExpression: $e")
             }
         }
     }
@@ -203,8 +203,7 @@ class CalculatorViewModel : ViewModel() {
                 "MC" -> onMemoryClear()
                 "MR" -> onMemoryRecall()
                 "MS" -> onMemorySave()
-                "=" -> onOperatorClicked(button)  // Separately handle the "=" for calculating the result
-                "+", "-", "*", "/", "^", "√" -> onOperatorClicked(button)  // Group all operators except "="
+                "+", "-", "*", "/", "^", "√", "=" -> onOperatorClicked(button)
                 "(", ")" -> onParenthesisClicked(button)  // Handle parentheses
 
                 "." -> onDecimalClicked()

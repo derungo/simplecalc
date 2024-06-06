@@ -7,6 +7,8 @@ android {
     namespace = "com.kindev.simplecalc2"
     compileSdk = 34
 
+
+
     defaultConfig {
         applicationId = "com.kindev.simplecalc2"
         minSdk = 21
@@ -45,14 +47,14 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
+           }
     }
 }
 
 dependencies {
 
-    implementation(libs.matheclipse.core)
-    implementation(libs.matheclipse.parser)
+    implementation(libs.mathparser.org.mxparser)
+
 
     implementation(libs.exp4j)
     implementation(libs.androidx.core.ktx)
