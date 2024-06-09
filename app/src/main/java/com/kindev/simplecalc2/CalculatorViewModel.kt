@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.mariuszgromada.math.mxparser.Expression
 
-
+// ViewModel class for the calculator
 class CalculatorViewModel : ViewModel() {
     private val _result = MutableStateFlow("0")
     val result: StateFlow<String> = _result
@@ -20,7 +20,8 @@ class CalculatorViewModel : ViewModel() {
 
     private var lastInputWasResult = false
 
-
+// function to update the display value
+// @param value: Double - the value to be displayed
     fun updateDisplayValue(value: Double) {
         viewModelScope.launch {
             _result.value = if (value % 1.0 == 0.0) {
@@ -31,6 +32,8 @@ class CalculatorViewModel : ViewModel() {
             lastInputWasResult = true
         }
     }
+// function to handle number input
+// @param number: Int - the number to be input
     fun onNumberClicked(number: Int) {
         viewModelScope.launch {
             if (lastInputWasResult) {
@@ -46,7 +49,8 @@ class CalculatorViewModel : ViewModel() {
             }
         }
     }
-
+// function to handle operator input
+// @param operator: String - the operator to be input
     fun onOperatorClicked(operator: String) {
         viewModelScope.launch {
             try {
@@ -99,6 +103,13 @@ class CalculatorViewModel : ViewModel() {
             }
         }
     }
+
+    /**
+     * Evaluate the current expression and update the display value
+
+     **not currently in use**
+
+
     private fun evaluateExpression() {
         viewModelScope.launch {
             try {
@@ -118,6 +129,10 @@ class CalculatorViewModel : ViewModel() {
         }
     }
 
+*/
+    // Add the current expression and result to the history
+    // @param expression: String - the expression to be added
+    // @param result: Double - the result to be added
     private fun addToHistory(expression: String, result: Double) {
         viewModelScope.launch {
             val newEntry = "$expression = $result"
@@ -127,6 +142,8 @@ class CalculatorViewModel : ViewModel() {
         }
     }
 
+    // Load the expression from history
+    // @param entry: String - the history entry to be loaded
     fun loadFromHistory(entry: String) {
         viewModelScope.launch {
             val parts = entry.split(" = ")
@@ -136,6 +153,8 @@ class CalculatorViewModel : ViewModel() {
             }
         }
     }
+
+    // Handle decimal input
     fun onDecimalClicked() {
         viewModelScope.launch {
             val currentResult = _result.value.trim()
@@ -147,6 +166,8 @@ class CalculatorViewModel : ViewModel() {
             }
         }
     }
+
+    // Handle clear input
     fun onClearClicked() {
         viewModelScope.launch {
             _result.value = "0"
@@ -154,6 +175,7 @@ class CalculatorViewModel : ViewModel() {
         }
     }
 
+    // Handle backspace input
     fun onBackspaceClicked() {
         viewModelScope.launch {
             val currentResult = _result.value
@@ -164,6 +186,9 @@ class CalculatorViewModel : ViewModel() {
             }
         }
     }
+
+    // Handle parentheses input
+    // @param parenthesis: String - the parenthesis to be added
     fun onParenthesisClicked(parenthesis: String) {
         viewModelScope.launch {
             val currentResult = _result.value.trim()
@@ -176,6 +201,7 @@ class CalculatorViewModel : ViewModel() {
         }
     }
 
+    // Recall the value from memory
     fun onMemoryRecall() {
         viewModelScope.launch {
             _result.value = _memory.value
@@ -183,18 +209,23 @@ class CalculatorViewModel : ViewModel() {
         }
     }
 
+    // Save the current result to memory
     fun onMemorySave() {
         viewModelScope.launch {
             _memory.value = _result.value
         }
     }
 
+    // Clear the memory value
     fun onMemoryClear() {
         viewModelScope.launch {
             _memory.value = "0"
         }
     }
 
+
+    // Handle button clicks
+    // @param button: String - the button clicked
     fun onButtonClicked(button: String) {
         viewModelScope.launch {
             when (button) {
@@ -204,11 +235,10 @@ class CalculatorViewModel : ViewModel() {
                 "MR" -> onMemoryRecall()
                 "MS" -> onMemorySave()
                 "+", "-", "*", "/", "^", "√", "=" -> onOperatorClicked(button)
-                "(", ")" -> onParenthesisClicked(button)  // Handle parentheses
-
+                "(", ")" -> onParenthesisClicked(button)
                 "." -> onDecimalClicked()
                 else -> {
-                    if (button.all { it.isDigit() }) { // Check if all characters in the button are digits
+                    if (button.all { it.isDigit() }) {
                         onNumberClicked(button.toInt())
                     }
                 }
