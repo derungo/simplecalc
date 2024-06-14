@@ -1,6 +1,5 @@
 package com.kindev.simplecalc2
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -18,23 +16,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-
 @Composable
 fun CalculatorButtonsGrid(viewModel: CalculatorViewModel) {
-    val buttons = listOf(
-        listOf("(", ")", "MC", "MR", "MS", "C"),
+    val buttonRows = listOf(
+        listOf("(", ")", "MC", "MR", "MS"),
         listOf("7", "8", "9", "/", "√"),
         listOf("4", "5", "6", "*", "^"),
         listOf("1", "2", "3", "-", "+"),
         listOf("0", ".", "←", "=")
     )
+
     Column(modifier = Modifier.fillMaxSize()) {
-        buttons.forEach { row ->
+        buttonRows.forEach { row ->
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
@@ -84,22 +81,13 @@ fun CalculatorButton(
             contentAlignment = Alignment.Center,
             modifier = Modifier.fillMaxSize()
         ) {
-            if (text == "C") {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_clear),
-                    contentDescription = "Clear",
-                    modifier = Modifier.size(24.dp),
-
-                )
-            } else {
-                Text(
-                    text = text,
-                    fontSize = fontSize,
-                    color = textColor,
-                    fontWeight = FontWeight.Bold,  // Making the text bold
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
+            Text(
+                text = text,
+                fontSize = fontSize,
+                color = textColor,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.align(Alignment.Center)
+            )
         }
     }
 }

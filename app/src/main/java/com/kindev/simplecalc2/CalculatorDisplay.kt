@@ -30,7 +30,7 @@ fun CalculatorDisplay(
             text = result,
             style = TextStyle(
                 fontSize = 36.sp,  // Increased font size for better visibility
-                color = Color.White,  // Set color within TextStyle
+                color = Color.Green,  // Set color within TextStyle
                 fontWeight = FontWeight.Bold  // Example to set fontWeight
             ),
             modifier = Modifier.padding(16.dp)

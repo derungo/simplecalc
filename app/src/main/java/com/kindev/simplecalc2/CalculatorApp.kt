@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -51,18 +52,33 @@ fun CalculatorAppContent(viewModel: CalculatorViewModel) {
                         CalculatorMemory(memory = viewModel.memory.collectAsState().value)
                     }
 
-                    // History button
-                    Image(
-                        painter = painterResource(id = R.drawable.historyicon),
-                        contentDescription = "History",
+                    // History and Clear buttons
+                    Row(
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
-                            .padding(end = 16.dp, bottom = 6.dp)
-                            .size(24.dp)
-                            .clickable { showHistory = !showHistory }
-                            .alpha(0.5f), // Semi-transparent
-                        colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(Color.Green
-                    ))
+                            .padding(end = 16.dp, bottom = 4.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.historyicon),
+                            contentDescription = "History",
+                            modifier = Modifier
+                                .size(30.dp)
+                                .clickable { showHistory = !showHistory }
+                                .alpha(0.5f) // Semi-transparent
+                                .padding(end = 10.dp), // Padding between buttons
+
+                            colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(Color.Green)
+                        )
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_clear),
+                            contentDescription = "Clear",
+                            modifier = Modifier
+                                .size(30.dp)
+                                .clickable { viewModel.onClearClicked() }
+                                .alpha(0.5f), // Semi-transparent
+                            colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(Color.Green)
+                        )
+                    }
                 }
 
                 // Button grid below the display
@@ -71,15 +87,15 @@ fun CalculatorAppContent(viewModel: CalculatorViewModel) {
 
             if (showHistory) {
                 Surface(
-                    color = Color.White,
+                    color = Color.Black,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(300.dp) // Adjust height as needed
                         .align(Alignment.BottomCenter)
                         .shadow(4.dp, RectangleShape)
                         .clip(RectangleShape)
-                        .background(Color.White, RectangleShape)
-                        .border(2.dp, Color.Blue, RectangleShape)
+                        .background(Color.Black, RectangleShape)
+                        .border(2.dp, Color.Green, RectangleShape)
                 ) {
                     CalculatorHistory(
                         history = viewModel.history.collectAsState().value,
@@ -104,7 +120,7 @@ fun CalculatorHistory(history: List<String>, onSelect: (String) -> Unit) {
         items(history) { entry ->
             Text(
                 text = entry,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyLarge.copy(color = Color.Green), // Change text color to white
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onSelect(entry) }
