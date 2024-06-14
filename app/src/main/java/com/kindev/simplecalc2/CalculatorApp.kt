@@ -33,12 +33,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
-
 @Composable
 fun CalculatorAppContent(viewModel: CalculatorViewModel) {
     var showHistory by remember { mutableStateOf(false) }
 
-    Surface(color = MaterialTheme.colorScheme.background) {
+    Surface(color = Color.Black) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
@@ -58,11 +57,12 @@ fun CalculatorAppContent(viewModel: CalculatorViewModel) {
                         contentDescription = "History",
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
-                            .padding(16.dp)
+                            .padding(end = 16.dp, bottom = 6.dp)
                             .size(24.dp)
                             .clickable { showHistory = !showHistory }
-                            .alpha(0.5f) // Semi-transparent
-                    )
+                            .alpha(0.5f), // Semi-transparent
+                        colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(Color.Green
+                    ))
                 }
 
                 // Button grid below the display

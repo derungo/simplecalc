@@ -1,19 +1,25 @@
 package com.kindev.simplecalc2
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -27,25 +33,30 @@ fun CalculatorButtonsGrid(viewModel: CalculatorViewModel) {
         listOf("1", "2", "3", "-", "+"),
         listOf("0", ".", "←", "=")
     )
-    // Using a Column to layout rows of buttons, filling available height
-    Column(modifier = Modifier.fillMaxSize()) {  // Now fills the maximum size available
+    Column(modifier = Modifier.fillMaxSize()) {
         buttons.forEach { row ->
             Row(
-                horizontalArrangement = Arrangement.SpaceBetween,  // Adjusted for no padding between buttons
-                modifier = Modifier.fillMaxWidth().weight(1f)
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(4.dp)
             ) {
                 row.forEach { label ->
                     CalculatorButton(
                         text = label,
                         onClick = { viewModel.onButtonClicked(label) },
-                        color = if (label.any { it.isDigit() }) Color.LightGray else Color.DarkGray,
-                        modifier = Modifier.weight(1f)
+                        color = if (label.any { it.isDigit() }) Color(0xFF66BB6A) else Color(0xFF2E7D32),
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(4.dp)
                     )
                 }
             }
         }
     }
 }
+
 @Composable
 fun CalculatorButton(
     text: String,
@@ -53,32 +64,42 @@ fun CalculatorButton(
     color: Color,
     modifier: Modifier = Modifier
 ) {
-    // Define categories for button types
     val isNumber = text.all { it.isDigit() }
-    val isSpecialFunction = text in listOf("C", "MC", "MR", "MS", "←")  // Identify special function keys
+    val isSpecialFunction = text in listOf( "MC", "MR", "MS", "←")
 
-    // Determine font size based on the category
-    val fontSize = if (isNumber || isSpecialFunction) 18.sp else 22.sp
-
-    // Define text color based on the category
-    val textColor = if (isSpecialFunction) Color.White  // Keep special functions white
-    else if (isNumber) Color.Black  // Numbers are black
-    else Color.White  // Default color for operators and other functions
-
-
+    val fontSize = when (text) {
+        "MC", "MR", "MS" -> 20.sp
+        else -> if (isNumber) 30.sp else 36.sp
+    }
+    val textColor = if (isSpecialFunction) Color.White else if (isNumber) Color.Black else Color.White
 
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = color),
-        shape = RoundedCornerShape(0.dp),  // Maintaining square corners
+        shape = RoundedCornerShape(8.dp),
         modifier = modifier
-            .fillMaxHeight()  // Ensuring buttons fill the available vertical space within their row
-            .padding(0.dp)  // Removing padding around the buttons
+            .fillMaxHeight()
     ) {
-        Text(
-            text = text,
-            fontSize = fontSize,  // Applying conditional font size
-            color = textColor  // Applying conditional text color
-        )
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            if (text == "C") {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_clear),
+                    contentDescription = "Clear",
+                    modifier = Modifier.size(24.dp),
+
+                )
+            } else {
+                Text(
+                    text = text,
+                    fontSize = fontSize,
+                    color = textColor,
+                    fontWeight = FontWeight.Bold,  // Making the text bold
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+        }
     }
 }
