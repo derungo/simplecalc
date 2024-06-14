@@ -1,5 +1,5 @@
 package com.kindev.simplecalc2
-
+//CalculatorApp.kt
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -111,7 +111,7 @@ fun CalculatorAppContent(viewModel: CalculatorViewModel) {
 }
 
 @Composable
-fun CalculatorHistory(history: List<String>, onSelect: (String) -> Unit) {
+fun CalculatorHistory(history: List<HistoryItem>, onSelect: (HistoryItem) -> Unit) {
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
@@ -119,7 +119,7 @@ fun CalculatorHistory(history: List<String>, onSelect: (String) -> Unit) {
     ) {
         items(history) { entry ->
             Text(
-                text = entry,
+                text = "${entry.expression} = ${entry.result}",
                 style = MaterialTheme.typography.bodyLarge.copy(color = Color.Green), // Change text color to white
                 modifier = Modifier
                     .fillMaxWidth()

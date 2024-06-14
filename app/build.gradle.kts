@@ -1,6 +1,11 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("com.google.devtools.ksp") version "2.0.0-1.0.21"
+    id("org.jetbrains.kotlin.plugin.compose") version "2.0.0"
+
+
+
 }
 
 android {
@@ -13,8 +18,8 @@ android {
         applicationId = "com.kindev.simplecalc2"
         minSdk = 21
         targetSdk = 34
-        versionCode = 3
-        versionName = "1.2"
+        versionCode = 4
+        versionName = "1.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -49,11 +54,21 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
            }
     }
+
 }
 
 dependencies {
 
     implementation(libs.mathparser.org.mxparser)
+    implementation(libs.dagger.compiler) {
+        exclude(group = "com.google.dagger", module = "dagger-spi")
+
+    }
+    implementation(libs.androidx.room.common)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.dagger.compiler)
+
+    ksp(libs.androidx.room.compiler) // Add Room compiler for KSP
 
 
     implementation(libs.exp4j)
@@ -73,4 +88,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
