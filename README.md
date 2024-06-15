@@ -74,7 +74,7 @@ Add notes about how to use the system.
 
 ## Contributing <a name = "contributing"></a>
 
-Contributions are welcome!
+Contributions are welcome! If you would be interested in testing please let me know, I am trying to get on google play and need to complete the closed testing with 20 users.
 
 ## Releases <a name = "releases"></a>
 
